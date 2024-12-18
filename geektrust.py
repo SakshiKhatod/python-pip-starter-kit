@@ -1,6 +1,4 @@
 from sys import argv
-
-# from src.services.commands import process_commands
 from src.services.command_line import CommandProcessor
 
 
@@ -15,7 +13,6 @@ def main():
     Lines = f.readlines()
     c = CommandProcessor()
     c.process_commands(Lines)
-    # process_commands(Lines)
 
 
 if __name__ == "__main__":

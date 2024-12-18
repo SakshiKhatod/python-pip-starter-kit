@@ -13,4 +13,5 @@ class ErrorCodes:
     INVALID_PLAN_DETAILS_MAPPING = (
         "Invalid plan details mapping for the given category and plan type"
     )
+    INVALID_INPUT="INVALID_INPUT"
     ADD_SUBSCRIPTION_FAILED = "ADD_SUBSCRIPTION_FAILED"

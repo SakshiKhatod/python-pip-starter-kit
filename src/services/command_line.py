@@ -6,9 +6,14 @@ from src.services.renewal_service import RenewalService
 from src.services.helper_functions import (
     is_valid_start_subscription,
     is_valid_add_topup,
-    is_valid_add_subscription,
     is_valid_category,
     is_valid_plan_type,
+)
+from src.constants.constant import (
+    START_SUBSCRIPTION,
+    ADD_SUBSCRIPTION,
+    ADD_TOPUP,
+    PRINT_RENEWAL_DETAILS,INPUT_ZERO
 )
 from src.constants.error_codes import ErrorCodes
 
@@ -83,21 +88,21 @@ class CommandProcessor:
                 if not parts:
                     continue
 
-                command = parts[0]
-                if command == "START_SUBSCRIPTION":
+                command = parts[INPUT_ZERO]
+                if command == START_SUBSCRIPTION:
                     self.handle_start_subscription(parts)
 
-                elif command == "ADD_SUBSCRIPTION":
+                elif command == ADD_SUBSCRIPTION:
                     self.handle_add_subscription(parts)
 
-                elif command == "ADD_TOPUP":
+                elif command == ADD_TOPUP:
                     self.handle_add_topup(parts)
 
-                elif command == "PRINT_RENEWAL_DETAILS":
+                elif command == PRINT_RENEWAL_DETAILS:
                     self.handle_print_renewal_details()
 
                 else:
-                    print("INVALID_INPUT")
+                    print(ErrorCodes.INVALID_INPUT)
                     return
         except Exception as e:
             print(f"Error occurred: {e}")
