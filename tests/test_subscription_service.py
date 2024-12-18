@@ -29,11 +29,17 @@ class TestSubscriptionService(unittest.TestCase):
         result = self.service.add_subscription(
             SubscriptionCategory.MUSIC, PlanType.PREMIUM
         )
-        self.assertEqual(result, ErrorCodes.ADD_SUBSCRIPTION_FAILED+" "+ErrorCodes.DUPLICATE_CATEGORY)
+        self.assertEqual(
+            result,
+            ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.DUPLICATE_CATEGORY,
+        )
 
     def test_add_subscription_invalid_category(self):
         result = self.service.add_subscription("INVALID", PlanType.PERSONAL)
-        self.assertEqual(result, ErrorCodes.ADD_SUBSCRIPTION_FAILED+" "+ErrorCodes.INVALID_CATEGORY)
+        self.assertEqual(
+            result,
+            ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_CATEGORY,
+        )
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 from sys import argv
-from src.services.command_line import process_commands
+
+# from src.services.commands import process_commands
+from src.services.command_line import CommandProcessor
 
 
 def main():
@@ -11,7 +13,9 @@ def main():
     file_path = argv[1]
     f = open(file_path, "r")
     Lines = f.readlines()
-    process_commands(Lines)
+    c = CommandProcessor()
+    c.process_commands(Lines)
+    # process_commands(Lines)
 
 
 if __name__ == "__main__":

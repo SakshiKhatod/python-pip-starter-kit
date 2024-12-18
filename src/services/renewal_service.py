@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.constants.constant import NO_OF_DAYS_BEFORE_TO_NOTIFY
+from src.constants.constant import NO_OF_DAYS_BEFORE_TO_NOTIFY, date_format
 from src.models.subscription import Subscription
 from dateutil.relativedelta import relativedelta
 
@@ -12,7 +12,7 @@ class RenewalService:
     def calculate_renewal_dates(self) -> dict:
         renewal_dates = {}
         if isinstance(self.subscription.start_date, str):
-            start_date = datetime.strptime(self.subscription.start_date, "%d-%m-%Y")
+            start_date = datetime.strptime(self.subscription.start_date, date_format)
         else:
             start_date = self.subscription.start_date
         for category, plan in self.subscription.plans.items():
@@ -22,7 +22,7 @@ class RenewalService:
                 days=NO_OF_DAYS_BEFORE_TO_NOTIFY
             )
 
-            renewal_dates[category] = reminder_date.strftime("%d-%m-%Y")
+            renewal_dates[category] = reminder_date.strftime(date_format)
             # print(f"Renewal Date: {renewal_date}, Reminder Date: {reminder_date}")
 
         return renewal_dates
