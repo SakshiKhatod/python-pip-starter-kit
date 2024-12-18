@@ -13,7 +13,7 @@ from src.constants.constant import (
     START_SUBSCRIPTION,
     ADD_SUBSCRIPTION,
     ADD_TOPUP,
-    PRINT_RENEWAL_DETAILS,INPUT_ZERO
+    PRINT_RENEWAL_DETAILS,INPUT_ONE,INPUT_TWO,INPUT_ZERO,ONE
 )
 from src.constants.error_codes import ErrorCodes
 
@@ -41,8 +41,8 @@ class CommandProcessor:
             self.stop_execution = True
             return
 
-        category = is_valid_category(parts[1])
-        plan_type = is_valid_plan_type(parts[2])
+        category = is_valid_category(parts[INPUT_ONE])
+        plan_type = is_valid_plan_type(parts[INPUT_TWO])
         if category and plan_type:
             result = self.subscription_service.add_subscription(category, plan_type)
             if result == (
@@ -106,4 +106,4 @@ class CommandProcessor:
                     return
         except Exception as e:
             print(f"Error occurred: {e}")
-            sys.exit(1)
+            sys.exit(ONE)

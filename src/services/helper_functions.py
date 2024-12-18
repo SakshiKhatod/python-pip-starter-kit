@@ -3,7 +3,7 @@ from src.enums.plan_type import PlanType
 from src.enums.topup_type import TopupType
 from src.constants.error_codes import ErrorCodes
 from datetime import datetime
-from src.constants.constant import DATE_FORMAT
+from src.constants.constant import DATE_FORMAT, INPUT_ONE, TWO, INPUT_TWO, THREE
 
 
 def is_valid_date(given_date: str) -> bool:
@@ -43,20 +43,20 @@ def is_valid_topup_type(topup_type: str) -> TopupType:
 
 
 def is_valid_start_subscription(parts):
-    if len(parts) < 2 or not is_valid_date(parts[1]):
+    if len(parts) < TWO or not is_valid_date(parts[INPUT_ONE]):
         print(ErrorCodes.INVALID_DATE)
         return
-    return parts[1]
+    return parts[INPUT_ONE]
 
 
 def is_valid_add_topup(parts, subscription):
     if not subscription:
         print(ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTION_NOT_FOUND)
         return None, None
-    if len(parts) < 3 or not parts[2].isdigit():
+    if len(parts) < THREE or not parts[INPUT_TWO].isdigit():
         print(ErrorCodes.ADD_TOPUP_FAILED)
         return None, None
-    topup_name_input, months = parts[1], int(parts[2])
+    topup_name_input, months = parts[INPUT_ONE], int(parts[INPUT_TWO])
     topup_name = is_valid_topup_type(topup_name_input)
     if not topup_name:
         print(ErrorCodes.ADD_TOPUP_FAILED)
