@@ -21,7 +21,7 @@ def is_valid_start_subscription(parts):
 
 def is_valid_add_topup(parts, subscription):
     if not subscription:
-        print(ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTION_NOT_FOUND)
+        print(ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
         return None, None
     if len(parts) < 3 or not parts[2].isdigit():
         print(ErrorCodes.ADD_TOPUP_FAILED)
@@ -64,7 +64,7 @@ def process_commands(lines):
                     print(
                         ErrorCodes.ADD_SUBSCRIPTION_FAILED
                         + " "
-                        + ErrorCodes.SUBSCRIPTION_NOT_FOUND
+                        + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
                     )
                     return  # Stop execution completely
                 if not start_date:  # Check if start_date is invalid or not set
@@ -108,7 +108,7 @@ def process_commands(lines):
                     print(
                         ErrorCodes.ADD_TOPUP_FAILED
                         + " "
-                        + ErrorCodes.SUBSCRIPTION_NOT_FOUND
+                        + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
                     )
                     return  # Stop execution completely
                 print(parts, subscription)
@@ -131,7 +131,7 @@ def process_commands(lines):
             # PRINT_RENEWAL_DETAILS command
             elif command == "PRINT_RENEWAL_DETAILS":
                 if not subscription or not subscription.has_active_subscriptions():
-                    print(ErrorCodes.SUBSCRIPTION_NOT_FOUND)
+                    print(ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
                     return  # Stop execution completely
                 else:
                     renewal_service.print_renewal_details()
@@ -144,4 +144,3 @@ def process_commands(lines):
     except Exception as e:
         print(f"Error occurred: {e}")
         sys.exit(1)
-

@@ -10,7 +10,9 @@ class TopupService:
 
     def add_topup(self, topup_type: TopupType, no_of_months: int):
         if not self.subscription.plans:
-            return ErrorCodes.ADD_TOPUP_FAILED+" "+ErrorCodes.SUBSCRIPTION_NOT_FOUND
+            return (
+                ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
+            )
         if self.subscription.topup:
             return ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.DUPLICATE_TOPUP
 

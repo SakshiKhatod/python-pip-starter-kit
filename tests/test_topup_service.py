@@ -26,7 +26,7 @@ class TestTopupService(unittest.TestCase):
         result = self.service.add_topup(TopupType.FOUR_DEVICE, 2)
         self.assertEqual(
             result,
-            ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTION_NOT_FOUND,
+            ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND,
         )
 
     def test_add_topup_duplicate(self):

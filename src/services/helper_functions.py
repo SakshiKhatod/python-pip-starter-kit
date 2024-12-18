@@ -51,7 +51,7 @@ def is_valid_start_subscription(parts):
 
 def is_valid_add_topup(parts, subscription):
     if not subscription:
-        print(ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTION_NOT_FOUND)
+        print(ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
         return None, None
     if len(parts) < THREE or not parts[INPUT_TWO].isdigit():
         print(ErrorCodes.ADD_TOPUP_FAILED)

@@ -13,7 +13,11 @@ from src.constants.constant import (
     START_SUBSCRIPTION,
     ADD_SUBSCRIPTION,
     ADD_TOPUP,
-    PRINT_RENEWAL_DETAILS,INPUT_ONE,INPUT_TWO,INPUT_ZERO,ONE
+    PRINT_RENEWAL_DETAILS,
+    INPUT_ONE,
+    INPUT_TWO,
+    INPUT_ZERO,
+    ONE,
 )
 from src.constants.error_codes import ErrorCodes
 
@@ -73,7 +77,7 @@ class CommandProcessor:
 
     def handle_print_renewal_details(self):
         if not self.subscription or not self.subscription.has_active_subscriptions():
-            print(ErrorCodes.SUBSCRIPTION_NOT_FOUND)
+            print(ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
             self.stop_execution = True
             return
         else:
