@@ -31,7 +31,7 @@ class CommandProcessor:
         self.start_date = None
         self.stop_execution = False
 
-    def handle_start_subscription(self, parts):
+    def handle_start_subscription_command(self, parts):
         self.start_date = is_valid_start_subscription(parts)
         if self.start_date:
             self.subscription = Subscription(self.start_date)
@@ -39,7 +39,7 @@ class CommandProcessor:
             self.topup_service = TopupService(self.subscription)
             self.renewal_service = RenewalService(self.subscription)
 
-    def handle_add_subscription(self, parts):
+    def handle_add_subscription_comand(self, parts):
         if not self.start_date:
             print(ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_DATE)
             self.stop_execution = True
@@ -62,7 +62,7 @@ class CommandProcessor:
             elif result:
                 print(result)
 
-    def handle_add_topup(self, parts):
+    def handle_add_topup_command(self, parts):
         topup_name, months = is_valid_add_topup(parts, self.subscription)
         if topup_name and months:
             result = self.topup_service.add_topup(topup_name, months)
@@ -75,7 +75,7 @@ class CommandProcessor:
             elif result:
                 print(result)
 
-    def handle_print_renewal_details(self):
+    def handle_print_renewal_details_command(self):
         if not self.subscription or not self.subscription.has_active_subscriptions():
             print(ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
             self.stop_execution = True
@@ -94,16 +94,16 @@ class CommandProcessor:
 
                 command = parts[INPUT_ZERO]
                 if command == START_SUBSCRIPTION:
-                    self.handle_start_subscription(parts)
+                    self.handle_start_subscription_command(parts)
 
                 elif command == ADD_SUBSCRIPTION:
-                    self.handle_add_subscription(parts)
+                    self.handle_add_subscription_comand(parts)
 
                 elif command == ADD_TOPUP:
-                    self.handle_add_topup(parts)
+                    self.handle_add_topup_command(parts)
 
                 elif command == PRINT_RENEWAL_DETAILS:
-                    self.handle_print_renewal_details()
+                    self.handle_print_renewal_details_command()
 
                 else:
                     print(ErrorCodes.INVALID_INPUT)
