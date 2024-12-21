@@ -1,20 +1,52 @@
 from src.constants.error_codes import ErrorCodes
 from src.models.topup import Topup
-from src.models.subscription import Subscription
-from src.enums.topup_type import TopupType
 
 
 class TopupService:
-    def __init__(self, subscription: Subscription):
-        self.subscription = subscription
+    def __init__(self):
+        self.topup = None
+        self.stop_execution = False
 
-    def add_topup(self, topup_type: TopupType, no_of_months: int):
-        if not self.subscription.plans:
-            return (
-                ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
-            )
-        if self.subscription.topup:
-            return ErrorCodes.ADD_TOPUP_FAILED + " " + ErrorCodes.DUPLICATE_TOPUP
-
-        self.subscription.topup = Topup(topup_type, no_of_months)
+    def add_topup(self, topup_type: str, no_of_months: int):
+        if self.topup:
+            self.stop_execution = True
+            return f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.DUPLICATE_TOPUP}"
+        new_topup = Topup()
+        if not new_topup.is_valid_topup(topup_type, no_of_months):
+            self.stop_execution = True
+            return f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_TOPUP_TYPE}"
+        self.topup = new_topup
+        self.topup.calculate_cost()
         return None
+
+    def calculate_topup_cost(self):
+        if not self.topup:
+            return 0
+        return self.topup.cost
+
+
+# class TopupService:
+#     def __init__(self):
+#         self.topup = None
+#         self.stop_execution = False
+
+#     def add_topup(self, topup_type: str, no_of_months: int):
+#         print("In add_topup function")
+
+#         new_topup = Topup()
+#         if not new_topup.is_valid_topup(topup_type, no_of_months):
+#             self.stop_execution = True
+#             return f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_TOPUP_TYPE}"
+#         if self.topup:
+#             self.stop_execution = True
+#             return f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.DUPLICATE_TOPUP}"
+
+#         self.topup = new_topup
+#         self.topup.calculate_cost()
+#         print(f"Top-up added: {self.topup}")
+#         return None
+
+#     def calculate_topup_cost(self):
+#         if not self.topup:
+#             return 0
+#         return self.topup.cost

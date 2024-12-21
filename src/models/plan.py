@@ -5,12 +5,20 @@ from src.constants.error_codes import ErrorCodes
 
 
 class Plan:
-    def __init__(self, plan_type: PlanType, category: SubscriptionCategory):
-        if plan_type.name not in PlanType.__members__:
-            raise ValueError(ErrorCodes.INVALID_PLAN_TYPE)
-        if category.name not in SubscriptionCategory.__members__:
-            raise ValueError(ErrorCodes.INVALID_CATEGORY)
+    def __init__(self):
+        self.category = None
+        self.plan_type = None
+        self.cost = None
+        self.duration = None
 
+    def is_valid_plan(self, plan_type: str) -> PlanType:
+        try:
+            return PlanType[plan_type]
+        except KeyError:
+            print(ErrorCodes.INVALID_PLAN_TYPE)
+            return None
+
+    def get_details(self, category: SubscriptionCategory, plan_type: PlanType):
         try:
             plan_details = PLAN_DETAILS[category][plan_type]
         except KeyError:
@@ -21,11 +29,9 @@ class Plan:
         self.cost = plan_details["cost"]
         self.duration = plan_details["duration"]
 
-    def get_details(self):
-        """Return plan details in a dictionary format."""
         return {
-            "category": self.category.name,
-            "plan_type": self.plan_type.name,
+            "category": self.category.value,
+            "plan_type": self.plan_type.value,
             "cost": self.cost,
             "duration_in_months": self.duration,
         }

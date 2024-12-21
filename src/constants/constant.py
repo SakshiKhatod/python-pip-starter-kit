@@ -10,3 +10,4 @@ INPUT_TWO = 2
 TWO = 2
 THREE = 3
 ONE = 1
+ZERO = 0

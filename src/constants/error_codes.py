@@ -10,6 +10,7 @@ class ErrorCodes:
     TOPUP_NOT_FOUND = "TOPUP_NOT_FOUND"
     ADD_SUBSCRIPTION_FAILED = "ADD_SUBSCRIPTION_FAILED"
     ADD_TOPUP_FAILED = "ADD_TOPUP_FAILED"
+    INVALID_TOPUP_DURATION = "INVALID_TOPUP_DURATION"
     INVALID_PLAN_DETAILS_MAPPING = (
         "Invalid plan details mapping for the given category and plan type"
     )
