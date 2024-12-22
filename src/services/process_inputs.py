@@ -8,6 +8,8 @@ from src.constants.constant import (
     ADD_TOPUP,
     PRINT_RENEWAL_DETAILS,
     ONE,
+    RENEWAL_REMINDER_MESSAGE,
+    RENEWAL_AMOUNT_MESSAGE,
 )
 from src.constants.error_codes import ErrorCodes
 from src.services.subscription_service import SubscriptionService
@@ -56,8 +58,8 @@ class ProcessCommands:
         renewal_dates = self._subscription_service.calculate_renewal_dates()
         renewal_details = []
         for category, date in renewal_dates.items():
-            renewal_details.append(f"RENEWAL_REMINDER {category} {date}")
-        renewal_details.append(f"RENEWAL_AMOUNT {total_cost}")
+            renewal_details.append(f"{RENEWAL_REMINDER_MESSAGE} {category} {date}")
+        renewal_details.append(f"{RENEWAL_AMOUNT_MESSAGE} {total_cost}")
         for detail in renewal_details:
             print(detail)
 

@@ -16,5 +16,4 @@ class Subscription:
         try:
             return SubscriptionCategory[category]
         except KeyError:
-            print(f"{ErrorCodes.INVALID_CATEGORY}: {category}")
             return None

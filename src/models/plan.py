@@ -15,7 +15,6 @@ class Plan:
         try:
             return PlanType[plan_type]
         except KeyError:
-            print(ErrorCodes.INVALID_PLAN_TYPE)
             return None
 
     def get_details(self, category: SubscriptionCategory, plan_type: PlanType):
