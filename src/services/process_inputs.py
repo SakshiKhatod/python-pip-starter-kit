@@ -19,7 +19,6 @@ class ProcessInputCommands:
         row = self.format_params(row)
         command, params = row[INPUT_ZERO], row[INPUT_ONE:]
         result = None
-
         if not params:
             result = getattr(self.user, INPUT_COMMANDS[command])()
         else:

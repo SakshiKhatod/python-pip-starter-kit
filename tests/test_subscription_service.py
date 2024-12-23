@@ -1,137 +1,120 @@
-from src.constants.constant import DATE_FORMAT, NO_OF_DAYS_BEFORE_TO_NOTIFY
-from src.services.subscription_service import SubscriptionService
+import unittest
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from src.models.subscription import Subscription
 from src.enums.subscription_category import SubscriptionCategory
 from src.enums.plan_type import PlanType
-from src.constants.error_codes import ErrorCodes
+from src.exceptions.subscription_exceptions import (
+    InvalidDateException,
+    InvalidCategoryException,
+    DuplicateCategoryException,
+    InvalidPlanTypeException,
+)
+from src.models.plan import Plan
+from dateutil.relativedelta import relativedelta
 import sys
 import os
 
 # Add the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-import unittest
-from datetime import datetime
-from unittest.mock import MagicMock
-from dateutil.relativedelta import relativedelta
 
-
-class TestSubscriptionService(unittest.TestCase):
+class TestSubscription(unittest.TestCase):
 
     def setUp(self):
-        self.service = SubscriptionService()
-        self.service.subscription.is_valid_date = MagicMock()
-        self.service.subscription.is_valid_category = MagicMock()
-        self.service.plan.is_valid_plan = MagicMock()
-        self.service.plan.get_details = MagicMock()
+        """Set up a fresh Subscription and Plan instance before each test."""
+        self.subscription = Subscription()
+        self.plan = Plan()
+        self.plan.add_plan(SubscriptionCategory.MUSIC, PlanType.PERSONAL)
+        self.subscription.plan = self.plan
 
-    def test_start_subscription_invalid_date(self):
-        self.service.subscription.is_valid_date.return_value = False
-        result = self.service.start_subscription("2024-12-32")
-        self.assertEqual(result, ErrorCodes.INVALID_DATE)
-
+    # Test to check whether subscription date is valid
     def test_start_subscription_valid_date(self):
-        self.service.subscription.is_valid_date.return_value = True
-        result = self.service.start_subscription("22-12-2024")
+        start_date = "20-02-2022"
+        result = self.subscription.start_subscription(start_date)
         self.assertIsNone(result)
         self.assertEqual(
-            self.service.start_date, datetime.strptime("22-12-2024", DATE_FORMAT)
+            self.subscription.start_date, datetime.strptime(start_date, "%d-%m-%Y")
         )
 
-    def test_add_plan(self):
-        self.service.add_plan(SubscriptionCategory.MUSIC, PlanType.FREE)
-        self.assertIn(SubscriptionCategory.MUSIC, self.service.plans)
-        self.assertEqual(self.service.plans[SubscriptionCategory.MUSIC], PlanType.FREE)
+    # Test to check if proper invalid date exception is occured
+    def test_start_subscription_invalid_date(self):
+        start_date = "2022-02-20"
+        with self.assertRaises(InvalidDateException):
+            self.subscription.start_subscription(start_date)
 
-    def test_add_subscription_no_start_date(self):
-        self.service.start_date = None
-        result = self.service.add_subscription("MUSIC", "FREE")
-        self.assertTrue(self.service.stop_execution)
-        self.assertEqual(
-            result, ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_DATE
-        )
+    # Test adding a subscription when the start date is not set
+    def test_add_subscription_invalid_date(self):
+        with self.assertRaises(InvalidDateException):
+            self.subscription.add_subscription(
+                SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
+            )
 
+    # Test adding a subscription with an invalid category
     def test_add_subscription_invalid_category(self):
-        self.service.start_date = "22-12-2024"
-        self.service.subscription.is_valid_category.return_value = None
-        result = self.service.add_subscription("STREAM", "PERSONAL")
-        self.assertTrue(self.service.stop_execution)
-        self.assertEqual(
-            result,
-            f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_CATEGORY}",
-        )
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        with self.assertRaises(InvalidCategoryException):
+            self.subscription.add_subscription("STREAM", PlanType.PERSONAL.value)
 
+    # Test adding a subscription with a duplicate category
     def test_add_subscription_duplicate_category(self):
-        self.service.start_date = "22-12-2024"
-        self.service.subscription.is_valid_category.return_value = (
-            SubscriptionCategory.MUSIC
-        )
-        self.service.plans[SubscriptionCategory.MUSIC] = PlanType.PREMIUM
-        result = self.service.add_subscription("MUSIC", "FREE")
-        self.assertTrue(self.service.stop_execution)
-        self.assertEqual(
-            result,
-            ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.DUPLICATE_CATEGORY,
-        )
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        self.plan.get_plans = lambda: {SubscriptionCategory.MUSIC: PlanType.PERSONAL}
+        with self.assertRaises(DuplicateCategoryException):
+            self.subscription.add_subscription(
+                SubscriptionCategory.MUSIC.value, PlanType.PERSONAL
+            )
 
+    # Test adding a subscription with an invalid plan type
     def test_add_subscription_invalid_plan_type(self):
-        self.service.start_date = "22-12-2024"
-        self.service.subscription.is_valid_category.return_value = (
-            SubscriptionCategory.MUSIC
-        )
-        self.service.plan.is_valid_plan.return_value = None
-        result = self.service.add_subscription("MUSIC", "VIP")
-        self.assertTrue(self.service.stop_execution)
-        self.assertEqual(
-            result,
-            f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_PLAN_TYPE}",
-        )
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        self.plan.get_plans = lambda: {}  # No plans added yet
+        with self.assertRaises(InvalidPlanTypeException):
+            self.subscription.add_subscription(SubscriptionCategory.MUSIC.value, "VIP")
 
-    def test_add_subscription_success(self):
-        self.service.start_date = "22-12-2024"
-        self.service.subscription.is_valid_category.return_value = (
-            SubscriptionCategory.PODCAST
-        )
-        self.service.plan.is_valid_plan.return_value = PlanType.PREMIUM
-        self.service.add_subscription("PODCAST", "PREMIUM")
-        self.assertIn(SubscriptionCategory.PODCAST, self.service.plans)
-        self.assertEqual(
-            self.service.plans[SubscriptionCategory.PODCAST], PlanType.PREMIUM
-        )
-
+    # Test calculating renewal dates
     def test_calculate_renewal_dates(self):
-        self.service.start_date = datetime.strptime("22-12-2024", DATE_FORMAT)
-        self.service.plan.get_details.return_value = {
-            "duration_in_months": 3,
-            "cost": 500,
-        }
-        self.service.plans = {SubscriptionCategory.VIDEO: PlanType.PREMIUM}
-        renewal_dates = self.service.calculate_renewal_dates()
-        self.assertIn(SubscriptionCategory.VIDEO.value, renewal_dates)
-        expected_date = (
-            self.service.start_date
-            + relativedelta(months=3)
-            - relativedelta(days=NO_OF_DAYS_BEFORE_TO_NOTIFY)
-        ).strftime(DATE_FORMAT)
-        self.assertEqual(renewal_dates[SubscriptionCategory.VIDEO.value], expected_date)
-
-    def test_calculate_subscription_cost(self):
-        self.service.plan.get_details.return_value = {
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        self.plan.get_plans = lambda: {SubscriptionCategory.MUSIC: PlanType.PERSONAL}
+        self.subscription.plan.get_details = lambda category, plan_type: {
+            "cost": 100,
             "duration_in_months": 1,
-            "cost": 200,
         }
-        self.service.plans = {SubscriptionCategory.VIDEO: PlanType.PERSONAL}
-        total_cost = self.service.calculate_subscription_cost()
-        self.assertEqual(total_cost, 200)
+        renewal_dates = self.subscription.calculate_renewal_dates()
+        self.assertEqual(
+            renewal_dates[SubscriptionCategory.MUSIC.value],
+            (
+                datetime.strptime(start_date, "%d-%m-%Y")
+                + relativedelta(months=1)
+                - relativedelta(days=10)
+            ).strftime("%d-%m-%Y"),
+        )
 
-    def test_get_subscriptions_with_subscriptions(self):
-        self.service.plans = {SubscriptionCategory.MUSIC: PlanType.PREMIUM}
-        result = self.service.get_subscriptions()
-        self.assertTrue(result)
+    # Test calculating the total cost of subscriptions
+    def test_calculate_subscription_cost(self):
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        self.plan.get_plans = lambda: {SubscriptionCategory.MUSIC: PlanType.PERSONAL}
+        self.subscription.plan.get_details = lambda category, plan_type: {
+            "cost": 100,
+            "duration_in_months": 1,
+        }
+        total_cost = self.subscription.calculate_subscription_cost()
+        self.assertEqual(total_cost, 100)
 
-    def test_get_subscriptions_no_subscriptions(self):
-        self.service.plans = {}
-        result = self.service.get_subscriptions()
-        self.assertFalse(result)
+    # Test if subscriptions exist
+    def test_get_subscriptions(self):
+        start_date = "20-02-2022"
+        self.subscription.start_subscription(start_date)
+        self.plan.get_plans = lambda: {SubscriptionCategory.MUSIC: PlanType.PERSONAL}
+        self.assertTrue(self.subscription.get_subscriptions())
+        # Test when no subscriptions exist
+        self.plan.get_plans = lambda: {}
+        self.assertFalse(self.subscription.get_subscriptions())
 
 
 if __name__ == "__main__":
