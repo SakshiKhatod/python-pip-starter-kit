@@ -1,23 +1,14 @@
-from sys import argv
-
-# from src.services.command_line import CommandProcessor
-from src.services.process_inputs import ProcessCommands
+import sys
+from src.services.process_inputs import ProcessInputCommands
 
 
-def main():
-    """
-    Sample code to read inputs from the file"""
+def main(file_path):
 
-    if len(argv) != 2:
-        raise Exception("File path not entered")
-    file_path = argv[1]
-    f = open(file_path, "r")
-    Lines = f.readlines()
-    c = ProcessCommands()
-    c.process_input_commands(Lines)
-    # c = CommandProcessor()
-    # c.process_commands(Lines)
+    c = ProcessInputCommands()
+    c.parse_input_file(file_path)
 
 
 if __name__ == "__main__":
-    main()
+
+    file_path = sys.argv[1]
+    main(file_path)

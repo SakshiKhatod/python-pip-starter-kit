@@ -1,3 +1,4 @@
+# errorcodes used in overall application
 class ErrorCodes:
     INVALID_DATE = "INVALID_DATE"
     SUBSCRIPTIONS_NOT_FOUND = "SUBSCRIPTIONS_NOT_FOUND"

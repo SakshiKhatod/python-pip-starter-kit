@@ -4,18 +4,28 @@ from src.enums.subscription_category import SubscriptionCategory
 from src.constants.error_codes import ErrorCodes
 
 
+# Plan class where plans can be added and retrieved
 class Plan:
     def __init__(self):
         self.category = None
         self.plan_type = None
         self.cost = None
         self.duration = None
+        self.plans = {}
 
     def is_valid_plan(self, plan_type: str) -> PlanType:
         try:
             return PlanType[plan_type]
         except KeyError:
             return None
+
+    def add_plan(
+        self, subscription_category: SubscriptionCategory, plan_type: PlanType
+    ):
+        self.plans[subscription_category] = plan_type
+
+    def get_plans(self):
+        return self.plans
 
     def get_details(self, category: SubscriptionCategory, plan_type: PlanType):
         try:

@@ -1,3 +1,4 @@
+# constants used in overall application
 ZERO = 0
 ONE = 1
 TWO = 2
@@ -13,3 +14,10 @@ START_SUBSCRIPTION = "START_SUBSCRIPTION"
 RENEWAL_AMOUNT_MESSAGE = "RENEWAL_AMOUNT"
 RENEWAL_REMINDER_MESSAGE = "RENEWAL_REMINDER"
 PRINT_RENEWAL_DETAILS = "PRINT_RENEWAL_DETAILS"
+
+INPUT_COMMANDS = {
+    "START_SUBSCRIPTION": "process_start_subscription",
+    "ADD_SUBSCRIPTION": "process_add_subscription",
+    "ADD_TOPUP": "process_add_topup",
+    "PRINT_RENEWAL_DETAILS": "process_print_renewal_details",
+}

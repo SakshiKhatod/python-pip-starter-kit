@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# Enums for type of topup
 class TopupType(Enum):
     FOUR_DEVICE = "FOUR_DEVICE"
     TEN_DEVICE = "TEN_DEVICE"

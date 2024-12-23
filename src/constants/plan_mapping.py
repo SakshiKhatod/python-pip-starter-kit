@@ -1,6 +1,7 @@
 from src.enums.plan_type import PlanType
 from src.enums.subscription_category import SubscriptionCategory
 
+# plan details mapping for category and plan
 PLAN_DETAILS = {
     SubscriptionCategory.MUSIC: {
         PlanType.FREE: {"cost": 0, "duration": 1},

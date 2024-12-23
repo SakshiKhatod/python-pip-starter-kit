@@ -1,24 +1,40 @@
 from src.enums.topup_type import TopupType
 from src.constants.error_codes import ErrorCodes
+from src.exceptions.topup_exceptions import InvalidTopupTypeError, DuplicateTopupError
 
 
+# Topup class for adding topups and calculting it's cost
 class Topup:
     def __init__(self):
-        self.type = None
+        self.topup_type = None
         self.duration = 0
         self.cost = 0
+        self.stop_execution = False
 
-    def is_valid_topup(self, topup_type: str, no_of_months: int) -> bool:
-        try:
-            # Validate that the top-up type is part of the enum
-            topup_enum = TopupType[topup_type]
-            self.no_of_months = no_of_months
-            self.cost = topup_enum.get_details()["cost"] * no_of_months
-            return True
-        except KeyError:
-            return False
+    def is_valid_topup_type(self, topup_type: str) -> bool:
+        return topup_type in TopupType.__members__
+
+    def add_topup(self, topup_type: str, no_of_months: int):
+        if self.topup_type:
+            self.stop_execution = True
+            raise DuplicateTopupError(
+                f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.DUPLICATE_TOPUP}"
+            )
+
+        if not self.is_valid_topup_type(topup_type):
+            self.stop_execution = True
+            raise InvalidTopupTypeError(
+                f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_TOPUP_TYPE}"
+            )
+
+        self.topup_type = TopupType[topup_type]
+        self.duration = no_of_months
+        self.calculate_cost()
 
     def calculate_cost(self):
-        if self.type and self.duration > 0:
-            topup_details = self.type.get_details()
+        if self.topup_type and self.duration > 0:
+            topup_details = self.topup_type.get_details()
             self.cost = topup_details["cost"] * self.duration
+
+    def get_topup_cost(self) -> int:
+        return self.cost if self.topup_type else 0
