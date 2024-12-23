@@ -1,6 +1,7 @@
 from src.enums.topup_type import TopupType
 from src.constants.error_codes import ErrorCodes
 from src.exceptions.topup_exceptions import InvalidTopupTypeError, DuplicateTopupError
+from src.constants.constant import TOPUP_COST_ZERO
 
 
 # Topup class for adding topups and calculting it's cost
@@ -32,9 +33,9 @@ class Topup:
         self.calculate_cost()
 
     def calculate_cost(self):
-        if self.topup_type and self.duration > 0:
+        if self.topup_type and self.duration > TOPUP_COST_ZERO:
             topup_details = self.topup_type.get_details()
             self.cost = topup_details["cost"] * self.duration
 
     def get_topup_cost(self) -> int:
-        return self.cost if self.topup_type else 0
+        return self.cost if self.topup_type else TOPUP_COST_ZERO

@@ -1,7 +1,6 @@
-from src.enums.topup_type import TopupType
-from src.constants.error_codes import ErrorCodes
 from src.models.topup import Topup
 from src.exceptions.topup_exceptions import InvalidTopupTypeError, DuplicateTopupError
+from src.constants.constant import TOPUP_COST_ZERO
 
 
 # service for calling topup related functions
@@ -24,5 +23,5 @@ class TopupService:
     def calculate_topup_cost(self):
         cost = self.topup.get_topup_cost()
         if cost is None:
-            return 0
+            return TOPUP_COST_ZERO
         return cost

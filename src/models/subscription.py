@@ -12,7 +12,8 @@ from src.exceptions.subscription_exceptions import (
     InvalidPlanTypeException,
 )
 
-#Subscription class where subscriptions can be added,cost calulated and retrieved
+
+# Subscription class where subscriptions can be added,cost calulated and retrieved
 class Subscription:
 
     def __init__(self):
@@ -26,7 +27,7 @@ class Subscription:
         except ValueError:
             return False
 
-    def start_subscription(self, start_date):
+    def start_subscription(self, start_date: str):
         if not self.is_valid_date(start_date):
             raise InvalidDateException(ErrorCodes.INVALID_DATE)
         self.start_date = datetime.strptime(start_date, DATE_FORMAT)
@@ -40,7 +41,6 @@ class Subscription:
 
     def add_subscription(self, subscription_category: str, plan_type: str) -> str:
         if not self.start_date:
-
             raise InvalidDateException(
                 ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_DATE
             )
@@ -70,7 +70,7 @@ class Subscription:
         plans = self.plan.get_plans()
         for category, plan_type in plans.items():
             if category in SubscriptionCategory and plan_type in PlanType:
-                plan_details = self.plan.get_details(category, plan_type)
+                plan_details = self.plan.get_plan_details(category, plan_type)
                 renewal_date = self.start_date + relativedelta(
                     months=plan_details["duration_in_months"]
                 )
@@ -87,7 +87,7 @@ class Subscription:
         plans = self.plan.get_plans()
         for category, plan_type in plans.items():
             if category in SubscriptionCategory and plan_type in PlanType:
-                plan_details = self.plan.get_details(category, plan_type)
+                plan_details = self.plan.get_plan_details(category, plan_type)
                 total_subscription_cost += plan_details["cost"]
             else:
                 print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)

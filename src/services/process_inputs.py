@@ -26,7 +26,6 @@ class ProcessInputCommands:
 
         return result
 
-    @staticmethod
     def format_params(row):
         ans = []
         for param in row:

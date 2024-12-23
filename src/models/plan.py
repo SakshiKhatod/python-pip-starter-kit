@@ -24,10 +24,10 @@ class Plan:
     ):
         self.plans[subscription_category] = plan_type
 
-    def get_plans(self):
+    def get_plans(self) -> dict:
         return self.plans
 
-    def get_details(self, category: SubscriptionCategory, plan_type: PlanType):
+    def get_plan_details(self, category: SubscriptionCategory, plan_type: PlanType):
         try:
             plan_details = PLAN_DETAILS[category][plan_type]
         except KeyError:
