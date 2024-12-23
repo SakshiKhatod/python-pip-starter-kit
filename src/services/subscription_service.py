@@ -12,7 +12,6 @@ from src.exceptions.subscription_exceptions import (
 class SubscriptionService:
     def __init__(self):
         self.subscription = Subscription()
-        self.plan = Plan()
 
     def start_subscription(self, start_date: str):
         try:
