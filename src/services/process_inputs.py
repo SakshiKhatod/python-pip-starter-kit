@@ -9,8 +9,8 @@ class ProcessInputCommands:
 
     # parsing input file
     def parse_input_file(self, file_path):
-        with open(file_path, "r") as file_obj:
-            for row in file_obj:
+        with open(file_path, "r") as file:
+            for row in file:
                 error_message = self.parse_each_row(row)
                 if error_message:
                     break  # Stop further command processing
