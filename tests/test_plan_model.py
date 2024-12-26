@@ -9,7 +9,7 @@ import os
 # Add the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-
+#Test for Plan model
 class TestPlan(unittest.TestCase):
 
     def setUp(self):

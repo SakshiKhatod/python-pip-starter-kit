@@ -2,7 +2,7 @@ from src.enums.plan_type import PlanType
 from src.enums.subscription_category import SubscriptionCategory
 from src.constants import constant
 
-# plan details mapping for category and plan
+# plan mapping for category and plan with details
 PLAN_DETAILS = {
     SubscriptionCategory.MUSIC: {
         PlanType.FREE: {

@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-# Enums for category of subscription
+# Enums for subscription categories
 class SubscriptionCategory(Enum):
     MUSIC = "MUSIC"
     VIDEO = "VIDEO"

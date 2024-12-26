@@ -17,9 +17,10 @@ from src.exceptions.subscription_exceptions import (
 class Subscription:
 
     def __init__(self):
-        self.plan = Plan()
+        self.plan = Plan()  # instantiating Plan class
         self.start_date = None
 
+    # function to check whether given date is valid or not
     def is_valid_date(self, given_date: str) -> bool:
         try:
             datetime.strptime(given_date, DATE_FORMAT)
@@ -27,25 +28,32 @@ class Subscription:
         except ValueError:
             return False
 
-    def start_subscription(self, start_date: str):
+    # function to start subscription from given date
+    def start_subscription(self, start_date: str) -> None:
         if not self.is_valid_date(start_date):
             raise InvalidDateException(ErrorCodes.INVALID_DATE)
         self.start_date = datetime.strptime(start_date, DATE_FORMAT)
         return None
 
-    def is_valid_category(self, category: str) -> SubscriptionCategory:
+    # function to check whether given subscription category is valid or not
+    def is_valid_category(self, category: str) -> SubscriptionCategory | None:
         try:
             return SubscriptionCategory[category]
         except KeyError:
             return None
 
-    def add_subscription(self, subscription_category: str, plan_type: str) -> str:
+    # function to add subscription with subscription category and plan given from user
+    def add_subscription(
+        self, subscription_category: str, plan_type: str
+    ) -> str | None:
         if not self.start_date:
             raise InvalidDateException(
                 ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_DATE
             )
 
-        category_enum = self.is_valid_category(subscription_category)
+        category_enum = self.is_valid_category(
+            subscription_category
+        )  # converting string to enum and check valid category
         if not category_enum:
             raise InvalidCategoryException(
                 f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_CATEGORY}"
@@ -56,15 +64,18 @@ class Subscription:
                 ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.DUPLICATE_CATEGORY
             )
 
-        plan_type_enum = self.plan.is_valid_plan(plan_type)
+        plan_type_enum = self.plan.is_valid_plan(
+            plan_type
+        )  # function to check valid plan
         if not plan_type_enum:
             raise InvalidPlanTypeException(
                 f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_PLAN_TYPE}"
             )
 
-        self.plan.add_plan(category_enum, plan_type_enum)
+        self.plan.add_plan(category_enum, plan_type_enum)  # function call to add plan
         return None
 
+    # function to calculate renewal dates
     def calculate_renewal_dates(self) -> dict:
         renewal_dates = {}
         plans = self.plan.get_plans()
@@ -82,6 +93,7 @@ class Subscription:
                 print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
         return renewal_dates
 
+    # function to calculate subscription cost
     def calculate_subscription_cost(self) -> int:
         total_subscription_cost = 0
         plans = self.plan.get_plans()
@@ -93,5 +105,6 @@ class Subscription:
                 print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
         return total_subscription_cost
 
+    # function to retreive all subscriptions
     def get_subscriptions(self) -> bool:
         return True if len(self.plan.get_plans()) > ZERO else False

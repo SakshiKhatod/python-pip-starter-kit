@@ -11,9 +11,10 @@ from src.exceptions.subscription_exceptions import (
 # service for calling subscription related functions
 class SubscriptionService:
     def __init__(self):
-        self.subscription = Subscription()
+        self.subscription = Subscription()  # instantiating object of Subscription model
 
-    def start_subscription(self, start_date: str):
+    # function to start subscription from given date
+    def start_subscription(self, start_date: str) -> str:
         try:
             result = self.subscription.start_subscription(start_date)
             if result:
@@ -21,7 +22,8 @@ class SubscriptionService:
         except InvalidDateException as e:
             return str(e)
 
-    def add_subscription(self, subscription_category: str, plan_type: str):
+    # function to add subscription with subscription category and plan given from user
+    def add_subscription(self, subscription_category: str, plan_type: str) -> str:
         try:
             result = self.subscription.add_subscription(
                 subscription_category, plan_type
@@ -37,7 +39,8 @@ class SubscriptionService:
         except InvalidPlanTypeException as e:
             return str(e)
 
-    def calculate_renewal_dates(self):
+    # function to calculate renewal dates
+    def calculate_renewal_dates(self) -> dict | str:
         try:
             renewal_dates = self.subscription.calculate_renewal_dates()
             if renewal_dates:
@@ -45,14 +48,16 @@ class SubscriptionService:
         except Exception as e:
             return str(e)
 
-    def calculate_subscription_cost(self):
+    # function to calculate subscription cost
+    def calculate_subscription_cost(self) -> int | str:
         try:
             total_cost = self.subscription.calculate_subscription_cost()
             return total_cost
         except Exception as e:
             return str(e)
 
-    def get_subscriptions(self):
+    # function to retreive all subscriptions
+    def get_subscriptions(self) -> bool | str:
         try:
             return self.subscription.get_subscriptions()
         except Exception as e:

@@ -7,6 +7,7 @@ class ProcessInputCommands:
     def __init__(self):
         self.user = User()
 
+    # parsing input file
     def parse_input_file(self, file_path):
         with open(file_path, "r") as file_obj:
             for row in file_obj:
@@ -14,6 +15,7 @@ class ProcessInputCommands:
                 if error_message:
                     break  # Stop further command processing
 
+    # parsing each row
     def parse_each_row(self, row):
         row = row.split(" ")
         row = self.format_params(row)
@@ -26,6 +28,7 @@ class ProcessInputCommands:
 
         return result
 
+    # formating the parameters of input commands
     @staticmethod
     def format_params(row):
         ans = []

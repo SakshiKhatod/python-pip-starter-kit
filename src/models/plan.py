@@ -13,21 +13,27 @@ class Plan:
         self.duration = None
         self.plans = {}
 
+    # function to check whether given subscription plan is valid or not
     def is_valid_plan(self, plan_type: str) -> PlanType:
         try:
             return PlanType[plan_type]
         except KeyError:
             return None
 
+    # function to add subscription plan with subscription category and plan type given from user
     def add_plan(
         self, subscription_category: SubscriptionCategory, plan_type: PlanType
     ):
         self.plans[subscription_category] = plan_type
 
+    # function to get all plans
     def get_plans(self) -> dict:
         return self.plans
 
-    def get_plan_details(self, category: SubscriptionCategory, plan_type: PlanType):
+    # function to get  plan details
+    def get_plan_details(
+        self, category: SubscriptionCategory, plan_type: PlanType
+    ) -> dict:
         try:
             plan_details = PLAN_DETAILS[category][plan_type]
         except KeyError:

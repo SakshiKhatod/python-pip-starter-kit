@@ -1,6 +1,6 @@
 from enum import Enum
 
-#Enums for type of plan
+#Enums for plan types
 class PlanType(Enum):
     FREE = "FREE"
     PERSONAL = "PERSONAL"
