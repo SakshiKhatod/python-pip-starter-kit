@@ -14,6 +14,7 @@ from src.exceptions.topup_exceptions import (
 from src.constants.constant import TOPUP_COST_ZERO
 from src.models.topup import Topup
 
+
 # Test for topup model
 class TestTopup(unittest.TestCase):
 

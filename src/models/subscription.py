@@ -10,11 +10,12 @@ from src.exceptions.subscription_exceptions import (
     InvalidCategoryException,
     DuplicateCategoryException,
     InvalidPlanTypeException,
+    InvalidOnlyDateException,
 )
 
 
 class Subscription:
-    """Class to start,add subscription with their renewal date and total subscription cost"""
+    """Class to start, add subscription with their renewal date and total subscription cost"""
 
     def __init__(self):
         self._plan = Plan()  # Private attribute for Plan instance
@@ -27,6 +28,11 @@ class Subscription:
             return True
         except ValueError:
             return False
+
+    def _validate_start_date(self):
+        """Helper method to ensure the start date is valid."""
+        if not self.is_start_date_valid():
+            raise InvalidDateException(f"{ErrorCodes.INVALID_DATE_EXCEPTION_MESSAGE}")
 
     def is_valid_plan_type(self, plan_type: str):
         """Private method to validate a subscription plan type."""
@@ -44,7 +50,7 @@ class Subscription:
     def start_subscription(self, start_date: str):
         """Start subscription from a given date."""
         if not self._is_valid_date(start_date):
-            raise InvalidDateException(ErrorCodes.INVALID_DATE)
+            raise InvalidOnlyDateException(ErrorCodes.INVALID_DATE)
         self._start_date = datetime.strptime(start_date, DATE_FORMAT)
 
     def _is_valid_category(self, category: str) -> SubscriptionCategory:
@@ -56,10 +62,10 @@ class Subscription:
                 f"{ErrorCodes.INVALID_CATEGORY_EXCEPTION_MESSAGE}"
             )
 
-    def add_subscription(self, subscription_category: str, plan_type: str):
-        """Add a subscription with a given category and plan type."""
-        if not self._start_date:
-            raise InvalidDateException(f"{ErrorCodes.INVALID_DATE_EXCEPTION_MESSAGE}")
+    def _validate_and_add_subscription(
+        self, subscription_category: str, plan_type: str
+    ):
+        """Helper method to validate category and add plan to prevent code duplication."""
         category_enum = self._is_valid_category(subscription_category)
         if category_enum in self._plan.get_plans():
             raise DuplicateCategoryException(
@@ -68,10 +74,15 @@ class Subscription:
         plan_type_enum = self.is_valid_plan_type(plan_type)
         self._plan.add_plan(category_enum, plan_type_enum)
 
+    def add_subscription(self, subscription_category: str, plan_type: str):
+        """Add a subscription with a given category and plan type."""
+        self._validate_start_date()
+        self._validate_and_add_subscription(subscription_category, plan_type)
+
     def _iterate_plans(self):
-        """Private method to iterate through and validate plans."""
-        valid_plans = []
+        """Private method to iterate through and return plan details."""
         plans = self._plan.get_plans()
+        valid_plans = []
         for category, plan_type in plans.items():
             if category in SubscriptionCategory and plan_type in PlanType:
                 plan_details = self._plan.get_plan_details(category, plan_type)

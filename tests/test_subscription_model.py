@@ -10,10 +10,10 @@ from src.models.subscription import Subscription
 from src.enums.subscription_category import SubscriptionCategory
 from src.enums.plan_type import PlanType
 from src.exceptions.subscription_exceptions import (
-    InvalidDateException,
     InvalidCategoryException,
     DuplicateCategoryException,
     InvalidPlanTypeException,
+    InvalidOnlyDateException,
 )
 from src.constants.constant import DATE_FORMAT
 
@@ -36,7 +36,7 @@ class TestSubscription(unittest.TestCase):
     def test_start_subscription_invalid_date(self):
         """Test starting a subscription with an invalid date format."""
         start_date = "2022-02-20"
-        with self.assertRaises(InvalidDateException):
+        with self.assertRaises(InvalidOnlyDateException):
             self.subscription.start_subscription(start_date)
 
     def test_add_subscription_valid(self):
