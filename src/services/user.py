@@ -34,25 +34,26 @@ class User:
         try:
 
             if not self._subscription_service.is_subscription_date_valid():
-                print(f"{ErrorCodes.INVALID_TOPUP_DATE_MESSAGE}")
-                return ErrorCodes.ADD_TOPUP_FAILED
+                raise TypeError(ErrorCodes.INVALID_TOPUP_DATE_MESSAGE)
             if not self._subscription_service.get_subscriptions():
-                print(f"{ErrorCodes.ADD_TOPUP_FAILED_SUBSCRIPTIONS_NOT_FOUND_MESSAGE}")
-                return ErrorCodes.ADD_TOPUP_FAILED
+                raise TypeError(
+                    ErrorCodes.ADD_TOPUP_FAILED_SUBSCRIPTIONS_NOT_FOUND_MESSAGE
+                )
 
             result = self._topup_service.add_topup(topup_type, months)
             if result:
                 print(result)
             return result
         except Exception as e:
-            return str(e)
+            return print(str(e))
 
     def process_print_renewal_details(self):
         """Prints renewal details for subscriptions and top-ups."""
         try:
             if not self._subscription_service.get_subscriptions():
-                print(ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
-                return ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
+                raise ValueError(
+                    ErrorCodes.PRINT_RENEWAL_DETAILS_SUBSCRIPTIONS_NOT_FOUND_MESSAGE
+                )
 
             total_cost = (
                 self._subscription_service.calculate_subscription_cost()
@@ -67,4 +68,4 @@ class User:
             for detail in renewal_details:
                 print(detail)
         except Exception as e:
-            return str(e)
+            return print(str(e))

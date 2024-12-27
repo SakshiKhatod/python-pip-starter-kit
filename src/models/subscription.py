@@ -4,7 +4,11 @@ from src.enums.plan_type import PlanType
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from src.models.plan import Plan
-from src.constants.constant import DATE_FORMAT, NO_OF_DAYS_BEFORE_TO_NOTIFY, ZERO
+from src.constants.constant import (
+    DATE_FORMAT,
+    NO_OF_DAYS_BEFORE_TO_NOTIFY,
+    DEFAULT_PLAN_LENGTH,
+)
 from src.exceptions.subscription_exceptions import (
     InvalidDateException,
     InvalidCategoryException,
@@ -113,4 +117,4 @@ class Subscription:
 
     def get_subscriptions(self) -> bool:
         """Check if there are any active subscriptions."""
-        return len(self._plan.get_plans()) > ZERO
+        return len(self._plan.get_plans()) > DEFAULT_PLAN_LENGTH

@@ -5,7 +5,7 @@ from src.exceptions.topup_exceptions import (
     DuplicateTopupError,
     InvalidTopupDurationError,
 )
-from src.constants.constant import TOPUP_COST_ZERO
+from src.constants.constant import TOPUP_COST_ZERO, TOPUP_DURATION_ZERO
 
 
 class Topup:
@@ -15,7 +15,6 @@ class Topup:
         self._topup_type = None  # Private attribute for topup type
         self._duration = 0  # Private attribute for duration
         self._cost = 0  # Private attribute for cost
-        self._stop_execution = False  # Private attribute to control execution flow
 
     def _is_valid_topup_type(self, topup_type: str) -> bool:
         """Private method to validate a topup type."""
@@ -24,11 +23,9 @@ class Topup:
     def add_topup(self, topup_type: str, no_of_months: int):
         """Add a topup with the given type and duration."""
         if self._topup_type:
-            self._stop_execution = True
             raise DuplicateTopupError(f"{ErrorCodes.DUPLICATE_TOPUP_ERROR_MESSAGE}")
 
         if not self._is_valid_topup_type(topup_type):
-            self._stop_execution = True
             raise InvalidTopupTypeError(
                 f"{ErrorCodes.INVALID_TOPUP_TYPE_ERROR_MESSAGE}"
             )
@@ -44,7 +41,7 @@ class Topup:
 
     def _calculate_cost(self):
         """Private method to calculate the topup cost."""
-        if self._topup_type and self._duration > TOPUP_COST_ZERO:
+        if self._topup_type and self._duration > TOPUP_DURATION_ZERO:
             topup_details = self._topup_type.get_details()
             self._cost = topup_details["cost"] * self._duration
 
