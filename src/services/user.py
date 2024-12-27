@@ -34,12 +34,10 @@ class User:
         try:
 
             if not self._subscription_service.is_subscription_date_valid():
-                print(f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_DATE}")
+                print(f"{ErrorCodes.INVALID_TOPUP_DATE_MESSAGE}")
                 return ErrorCodes.ADD_TOPUP_FAILED
             if not self._subscription_service.get_subscriptions():
-                print(
-                    f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.SUBSCRIPTIONS_NOT_FOUND}"
-                )
+                print(f"{ErrorCodes.ADD_TOPUP_FAILED_SUBSCRIPTIONS_NOT_FOUND_MESSAGE}")
                 return ErrorCodes.ADD_TOPUP_FAILED
 
             result = self._topup_service.add_topup(topup_type, months)
