@@ -4,37 +4,42 @@ from src.enums.subscription_category import SubscriptionCategory
 from src.constants.error_codes import ErrorCodes
 
 
-# class to add and get details of plan
+"""class to add and get details of plan"""
+
+
 class Plan:
     def __init__(self):
         self._plans = {}
 
-    # Function to check whether given subscription plan is valid or not
+    def _get_plan_data(self, category: SubscriptionCategory, plan_type: PlanType):
+        """Function to fetch plan data with error handling."""
+        try:
+            return PLAN_DETAILS[category][plan_type]
+        except KeyError:
+            raise ValueError(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
+
     def is_valid_plan(self, plan_type: str) -> PlanType:
+        """Function to check whether given subscription plan is valid or not"""
         try:
             return PlanType[plan_type]
         except KeyError:
             return None
 
-    # Function to add subscription plan with subscription category and plan type
     def add_plan(
         self, subscription_category: SubscriptionCategory, plan_type: PlanType
     ):
+        """Function to add subscription plan with subscription category and plan type"""
         self._plans[subscription_category] = plan_type
 
-    # Function to get all plans
     def get_plans(self) -> dict:
+        """Function to get all plans"""
         return self._plans
 
-    # Function to get plan details
     def get_plan_details(
         self, category: SubscriptionCategory, plan_type: PlanType
     ) -> dict:
-        try:
-            plan_details = PLAN_DETAILS[category][plan_type]
-        except KeyError:
-            raise ValueError(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
-
+        """Function to get plan details"""
+        plan_details = self._get_plan_data(category, plan_type)
         return {
             "category": category.value,
             "plan_type": plan_type.value,

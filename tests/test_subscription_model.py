@@ -25,24 +25,23 @@ class TestSubscription(unittest.TestCase):
     def setUp(self):
         """Set up fresh Subscription instances before each test."""
         self.subscription = Subscription()
+        self.start_date = "20-02-2022"
 
     def test_start_subscription_valid_date(self):
         """Test starting a subscription with a valid date."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
-        expected_date = datetime.strptime(start_date, DATE_FORMAT)
+        self.subscription.start_subscription(self.start_date)
+        expected_date = datetime.strptime(self.start_date, DATE_FORMAT)
         self.assertEqual(self.subscription._start_date, expected_date)
 
     def test_start_subscription_invalid_date(self):
         """Test starting a subscription with an invalid date format."""
-        start_date = "2022-02-20"
+        invalid_start_date = "2022-02-20"
         with self.assertRaises(InvalidOnlyDateException):
-            self.subscription.start_subscription(start_date)
+            self.subscription.start_subscription(invalid_start_date)
 
     def test_add_subscription_valid(self):
         """Test adding a valid subscription."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+        self.subscription.start_subscription(self.start_date)
         self.subscription.add_subscription(
             SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
         )
@@ -52,8 +51,8 @@ class TestSubscription(unittest.TestCase):
 
     def test_add_subscription_invalid_category(self):
         """Test adding a subscription with an invalid category."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         with self.assertRaises(InvalidCategoryException):
             self.subscription.add_subscription(
                 "INVALID_CATEGORY", PlanType.PERSONAL.value
@@ -61,15 +60,15 @@ class TestSubscription(unittest.TestCase):
 
     def test_add_subscription_invalid_plan_type(self):
         """Test adding a subscription with an invalid plan type."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         with self.assertRaises(InvalidPlanTypeException):
             self.subscription.add_subscription(SubscriptionCategory.MUSIC.value, "VIP")
 
     def test_add_subscription_duplicate_category(self):
         """Test adding a duplicate subscription category."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         self.subscription.add_subscription(
             SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
         )
@@ -80,14 +79,14 @@ class TestSubscription(unittest.TestCase):
 
     def test_calculate_renewal_dates(self):
         """Test calculating renewal dates for subscriptions."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         self.subscription.add_subscription(
             SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
         )
         renewal_dates = self.subscription.calculate_renewal_dates()
         expected_date = (
-            datetime.strptime(start_date, DATE_FORMAT)
+            datetime.strptime(self.start_date, DATE_FORMAT)
             + relativedelta(months=1)
             - relativedelta(days=10)
         ).strftime(DATE_FORMAT)
@@ -95,8 +94,8 @@ class TestSubscription(unittest.TestCase):
 
     def test_calculate_subscription_cost(self):
         """Test calculating the total cost of subscriptions."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         self.subscription.add_subscription(
             SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
         )
@@ -105,8 +104,8 @@ class TestSubscription(unittest.TestCase):
 
     def test_get_subscriptions(self):
         """Test retrieving subscriptions."""
-        start_date = "20-02-2022"
-        self.subscription.start_subscription(start_date)
+
+        self.subscription.start_subscription(self.start_date)
         self.subscription.add_subscription(
             SubscriptionCategory.MUSIC.value, PlanType.PERSONAL.value
         )

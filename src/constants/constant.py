@@ -16,7 +16,7 @@ INPUT_COMMANDS = {
     "PRINT_RENEWAL_DETAILS": "process_print_renewal_details",
 }
 
-# per category price
+# per category price and validity
 MUSIC_FREE_PLAN_PRICE = 0
 MUSIC_FREE_PLAN_VALIDITY = 1
 MUSIC_PERSONAL_PLAN_PRICE = 100

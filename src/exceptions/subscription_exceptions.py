@@ -29,4 +29,6 @@ class InvalidPlanTypeException(SubscriptionException):
 
 
 class InvalidOnlyDateException(SubscriptionException):
+    """Raised when the only date  is invalid."""
+
     pass

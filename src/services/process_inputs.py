@@ -3,24 +3,29 @@ from src.services.user import User
 from src.constants.error_codes import ErrorCodes
 
 
-# Class to process the input commands coming in
+""" Class to process the input commands coming in"""
+
+
 class ProcessInputCommands:
     def __init__(self):
-        self._user = User()  # Keeping User instance private
+        self._user = User()
 
-    # Public method to process an input file
+    """ Method to process an input file"""
+
     def parse_input_file(self, file_path: str):
         with open(file_path, "r") as file:
             results = [self._parse_each_row(row.strip()) for row in file]
         return results
 
-    # Private method to process each row
+    """ Method to process each row"""
+
     def _parse_each_row(self, row: str):
         formatted_row = self._format_params(row.split(" "))
         command, params = formatted_row[INPUT_ZERO], formatted_row[INPUT_ONE:]
         return self._execute_command(command, params)
 
-    # Private method to format parameters
+    """ Method to format parameters"""
+
     @staticmethod
     def _format_params(row: list):
         formatted_params = []
@@ -32,7 +37,8 @@ class ProcessInputCommands:
                 formatted_params.append(param)
         return formatted_params
 
-    # Private method to execute commands
+    """ Method to execute commands- command design pattern"""
+
     def _execute_command(self, command: str, params: list):
         if command not in INPUT_COMMANDS:
             raise ValueError(ErrorCodes.INVALID_INPUT)

@@ -34,22 +34,50 @@ class Subscription:
             return False
 
     def _validate_start_date(self):
-        """Helper method to ensure the start date is valid."""
+        """Method to check the start date is valid. and throw exception"""
         if not self.is_start_date_valid():
             raise InvalidDateException(f"{ErrorCodes.INVALID_DATE_EXCEPTION_MESSAGE}")
 
     def is_valid_plan_type(self, plan_type: str):
         """Private method to validate a subscription plan type."""
-        plan_type_enum = self._plan.is_valid_plan(plan_type)
-        if not plan_type_enum:
-            raise InvalidPlanTypeException(
-                f"{ErrorCodes.INVALID_PLAN_TYPE_EXCEPTION_MESSAGE}"
-            )
-        return plan_type_enum
+        return self._validate_enum(PlanType, plan_type, InvalidPlanTypeException)
+
+    def _is_valid_category(self, category: str) -> SubscriptionCategory:
+        """Private method to validate a subscription category."""
+        return self._validate_enum(
+            SubscriptionCategory, category, InvalidCategoryException
+        )
+
+    def _validate_enum(self, enum_class, value: str, exception_class):
+        """Method to convert str to enums to avoid repetition."""
+        try:
+            return enum_class[value]
+        except KeyError:
+            raise exception_class(f"{ErrorCodes.INVALID_CATEGORY_EXCEPTION_MESSAGE}")
 
     def is_start_date_valid(self) -> bool:
         """Public method to check if the subscription start date is set and valid."""
         return self._start_date is not None
+
+    def _iterate_plans(self):
+        """Private method to iterate through and return plan details."""
+        plans = self._plan.get_plans()
+        return [
+            (category, plan_type, self._get_plan_details(category, plan_type))
+            for category, plan_type in plans.items()
+            if self._is_valid_plan(category, plan_type)
+        ]
+
+    def _get_plan_details(self, category, plan_type):
+        """Method to fetch plan details."""
+        return self._plan.get_plan_details(category, plan_type)
+
+    def _is_valid_plan(self, category, plan_type):
+        """Method to validate both category and plan type existence."""
+        if category not in SubscriptionCategory or plan_type not in PlanType:
+            print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
+            return False
+        return True
 
     def start_subscription(self, start_date: str):
         """Start subscription from a given date."""
@@ -57,19 +85,10 @@ class Subscription:
             raise InvalidOnlyDateException(ErrorCodes.INVALID_DATE)
         self._start_date = datetime.strptime(start_date, DATE_FORMAT)
 
-    def _is_valid_category(self, category: str) -> SubscriptionCategory:
-        """Private method to validate a subscription category."""
-        try:
-            return SubscriptionCategory[category]
-        except KeyError:
-            raise InvalidCategoryException(
-                f"{ErrorCodes.INVALID_CATEGORY_EXCEPTION_MESSAGE}"
-            )
-
     def _validate_and_add_subscription(
         self, subscription_category: str, plan_type: str
     ):
-        """Helper method to validate category and add plan to prevent code duplication."""
+        """Method to validate category and add plan to prevent code duplication."""
         category_enum = self._is_valid_category(subscription_category)
         if category_enum in self._plan.get_plans():
             raise DuplicateCategoryException(
@@ -82,18 +101,6 @@ class Subscription:
         """Add a subscription with a given category and plan type."""
         self._validate_start_date()
         self._validate_and_add_subscription(subscription_category, plan_type)
-
-    def _iterate_plans(self):
-        """Private method to iterate through and return plan details."""
-        plans = self._plan.get_plans()
-        valid_plans = []
-        for category, plan_type in plans.items():
-            if category in SubscriptionCategory and plan_type in PlanType:
-                plan_details = self._plan.get_plan_details(category, plan_type)
-                valid_plans.append((category, plan_type, plan_details))
-            else:
-                print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
-        return valid_plans
 
     def calculate_renewal_dates(self) -> dict:
         """Calculate renewal dates for all subscriptions."""
@@ -110,10 +117,7 @@ class Subscription:
 
     def calculate_subscription_cost(self) -> int:
         """Calculate the total cost of all subscriptions."""
-        total_subscription_cost = 0
-        for _, _, plan_details in self._iterate_plans():
-            total_subscription_cost += plan_details["cost"]
-        return total_subscription_cost
+        return sum(plan_details["cost"] for _, _, plan_details in self._iterate_plans())
 
     def get_subscriptions(self) -> bool:
         """Check if there are any active subscriptions."""
