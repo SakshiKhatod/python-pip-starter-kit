@@ -8,6 +8,8 @@ from src.exceptions.subscription_exceptions import (
 )
 
 """ service for calling subscription related functions"""
+
+
 class SubscriptionService:
     def __init__(self):
         self.subscription = Subscription()  # instantiating object of Subscription model
@@ -33,7 +35,7 @@ class SubscriptionService:
         return self._handle_service_method(self.subscription.is_start_date_valid)
 
     def start_subscription(self, start_date: str):
-        """call to start a subscription from the given date."""
+        """Call to start a subscription from the given date."""
         return self._handle_service_method(
             self.subscription.start_subscription, start_date
         )
