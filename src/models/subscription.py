@@ -13,98 +13,93 @@ from src.exceptions.subscription_exceptions import (
 )
 
 
-# Subscription class where subscriptions can be added,cost calulated and retrieved
 class Subscription:
+    """Class to start,add subscription with their renewal date and total subscription cost"""
 
     def __init__(self):
-        self.plan = Plan()  # instantiating Plan class
-        self.start_date = None
+        self._plan = Plan()  # Private attribute for Plan instance
+        self._start_date = None
 
-    # function to check whether given date is valid or not
-    def is_valid_date(self, given_date: str) -> bool:
+    def _is_valid_date(self, given_date: str) -> bool:
+        """Private method to validate a given date."""
         try:
             datetime.strptime(given_date, DATE_FORMAT)
             return True
         except ValueError:
             return False
 
-    # function to start subscription from given date
-    def start_subscription(self, start_date: str) -> None:
-        if not self.is_valid_date(start_date):
-            raise InvalidDateException(ErrorCodes.INVALID_DATE)
-        self.start_date = datetime.strptime(start_date, DATE_FORMAT)
-        return None
+    def is_valid_plan_type(self, plan_type: str):
+        """Private method to validate a subscription plan type."""
+        plan_type_enum = self._plan.is_valid_plan(plan_type)
+        if not plan_type_enum:
+            raise InvalidPlanTypeException(
+                f"{ErrorCodes.INVALID_PLAN_TYPE_EXCEPTION_MESSAGE}"
+            )
+        return plan_type_enum
 
-    # function to check whether given subscription category is valid or not
-    def is_valid_category(self, category: str) -> SubscriptionCategory | None:
+    def is_start_date_valid(self) -> bool:
+        """Public method to check if the subscription start date is set and valid."""
+        return self._start_date is not None
+
+    def start_subscription(self, start_date: str):
+        """Start subscription from a given date."""
+        if not self._is_valid_date(start_date):
+            raise InvalidDateException(ErrorCodes.INVALID_DATE)
+        self._start_date = datetime.strptime(start_date, DATE_FORMAT)
+
+    def _is_valid_category(self, category: str) -> SubscriptionCategory:
+        """Private method to validate a subscription category."""
         try:
             return SubscriptionCategory[category]
         except KeyError:
-            return None
-
-    # function to add subscription with subscription category and plan given from user
-    def add_subscription(
-        self, subscription_category: str, plan_type: str
-    ) -> str | None:
-        if not self.start_date:
-            raise InvalidDateException(
-                ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.INVALID_DATE
-            )
-
-        category_enum = self.is_valid_category(
-            subscription_category
-        )  # converting string to enum and check valid category
-        if not category_enum:
             raise InvalidCategoryException(
-                f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_CATEGORY}"
+                f"{ErrorCodes.INVALID_CATEGORY_EXCEPTION_MESSAGE}"
             )
 
-        if category_enum in self.plan.get_plans():
+    def add_subscription(self, subscription_category: str, plan_type: str):
+        """Add a subscription with a given category and plan type."""
+        if not self._start_date:
+            raise InvalidDateException(f"{ErrorCodes.INVALID_DATE_EXCEPTION_MESSAGE}")
+        category_enum = self._is_valid_category(subscription_category)
+        if category_enum in self._plan.get_plans():
             raise DuplicateCategoryException(
-                ErrorCodes.ADD_SUBSCRIPTION_FAILED + " " + ErrorCodes.DUPLICATE_CATEGORY
+                f"{ErrorCodes.DUPLICATE_CATEGORY_EXCEPTION_MESSAGE}"
             )
+        plan_type_enum = self.is_valid_plan_type(plan_type)
+        self._plan.add_plan(category_enum, plan_type_enum)
 
-        plan_type_enum = self.plan.is_valid_plan(
-            plan_type
-        )  # function to check valid plan
-        if not plan_type_enum:
-            raise InvalidPlanTypeException(
-                f"{ErrorCodes.ADD_SUBSCRIPTION_FAILED} {ErrorCodes.INVALID_PLAN_TYPE}"
-            )
-
-        self.plan.add_plan(category_enum, plan_type_enum)  # function call to add plan
-        return None
-
-    # function to calculate renewal dates
-    def calculate_renewal_dates(self) -> dict:
-        renewal_dates = {}
-        plans = self.plan.get_plans()
+    def _iterate_plans(self):
+        """Private method to iterate through and validate plans."""
+        valid_plans = []
+        plans = self._plan.get_plans()
         for category, plan_type in plans.items():
             if category in SubscriptionCategory and plan_type in PlanType:
-                plan_details = self.plan.get_plan_details(category, plan_type)
-                renewal_date = self.start_date + relativedelta(
-                    months=plan_details["duration_in_months"]
-                )
-                reminder_date = renewal_date - relativedelta(
-                    days=NO_OF_DAYS_BEFORE_TO_NOTIFY
-                )
-                renewal_dates[category.value] = reminder_date.strftime(DATE_FORMAT)
+                plan_details = self._plan.get_plan_details(category, plan_type)
+                valid_plans.append((category, plan_type, plan_details))
             else:
                 print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
+        return valid_plans
+
+    def calculate_renewal_dates(self) -> dict:
+        """Calculate renewal dates for all subscriptions."""
+        renewal_dates = {}
+        for category, _, plan_details in self._iterate_plans():
+            renewal_date = self._start_date + relativedelta(
+                months=plan_details["duration_in_months"]
+            )
+            reminder_date = renewal_date - relativedelta(
+                days=NO_OF_DAYS_BEFORE_TO_NOTIFY
+            )
+            renewal_dates[category.value] = reminder_date.strftime(DATE_FORMAT)
         return renewal_dates
 
-    # function to calculate subscription cost
     def calculate_subscription_cost(self) -> int:
+        """Calculate the total cost of all subscriptions."""
         total_subscription_cost = 0
-        plans = self.plan.get_plans()
-        for category, plan_type in plans.items():
-            if category in SubscriptionCategory and plan_type in PlanType:
-                plan_details = self.plan.get_plan_details(category, plan_type)
-                total_subscription_cost += plan_details["cost"]
-            else:
-                print(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
+        for _, _, plan_details in self._iterate_plans():
+            total_subscription_cost += plan_details["cost"]
         return total_subscription_cost
 
-    # function to retreive all subscriptions
     def get_subscriptions(self) -> bool:
-        return True if len(self.plan.get_plans()) > ZERO else False
+        """Check if there are any active subscriptions."""
+        return len(self._plan.get_plans()) > ZERO

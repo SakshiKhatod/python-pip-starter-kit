@@ -9,7 +9,8 @@ import os
 # Add the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-#Test for Plan model
+
+# Test for Plan model
 class TestPlan(unittest.TestCase):
 
     def setUp(self):
@@ -48,7 +49,9 @@ class TestPlan(unittest.TestCase):
     # Assert that the details match what we expect from PLAN_DETAILS
     def test_get_details_valid_plan(self):
         self.plan.add_plan(SubscriptionCategory.MUSIC, PlanType.PERSONAL)
-        details = self.plan.get_details(SubscriptionCategory.MUSIC, PlanType.PERSONAL)
+        details = self.plan.get_plan_details(
+            SubscriptionCategory.MUSIC, PlanType.PERSONAL
+        )
         self.assertEqual(details["category"], SubscriptionCategory.MUSIC.value)
         self.assertEqual(details["plan_type"], PlanType.PERSONAL.value)
         self.assertEqual(details["cost"], 100)

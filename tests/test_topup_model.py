@@ -6,52 +6,58 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 
 import unittest
 from src.enums.topup_type import TopupType
-from src.exceptions.topup_exceptions import InvalidTopupTypeError, DuplicateTopupError
+from src.exceptions.topup_exceptions import (
+    InvalidTopupTypeError,
+    DuplicateTopupError,
+    InvalidTopupDurationError,
+)
+from src.constants.constant import TOPUP_COST_ZERO
 from src.models.topup import Topup
 
-
-# Test for Topup model
+# Test for topup model
 class TestTopup(unittest.TestCase):
 
     def setUp(self):
         """Set up a fresh Topup instance before each test."""
         self.topup = Topup()
 
-    # Test for a valid topup type
-    def test_is_valid_topup_type_valid(self):
-        self.assertTrue(self.topup.is_valid_topup_type(TopupType.FOUR_DEVICE.value))
-
-    # Test for invalid topup type
-    def test_is_valid_topup_type_invalid(self):
-        self.assertFalse(self.topup.is_valid_topup_type("SIX_DEVICE"))
-
-    # Test adding a valid topup and calculating cost
     def test_add_topup_valid(self):
-        self.topup.add_topup(TopupType.FOUR_DEVICE.value, 3)
-        self.assertEqual(self.topup.topup_type, TopupType.FOUR_DEVICE)
-        self.assertEqual(self.topup.duration, 3)
-        self.assertEqual(self.topup.cost, 150)
+        """Test adding a valid topup and calculating cost."""
+        self.topup.add_topup(TopupType.FOUR_DEVICE.value, 3)  # Adding valid topup
+        self.assertEqual(
+            self.topup._topup_type, TopupType.FOUR_DEVICE
+        )  # Indirectly check topup type
+        self.assertEqual(self.topup._duration, 3)  # Check duration
+        self.assertEqual(
+            self.topup.get_topup_cost(), 150
+        )  # Assuming cost for FOUR_DEVICE * 3 months
 
-    # Test if InvalidTopupTypeError is raised for invalid topup type
-    def test_add_topup_invalid_topup_type(self):
+    def test_add_topup_invalid_type(self):
+        """Test adding an invalid topup type."""
         with self.assertRaises(InvalidTopupTypeError):
-            self.topup.add_topup("SIX_DEVICE", 3)
+            self.topup.add_topup("INVALID_TYPE", 3)  # Invalid topup type
 
-    # Test if DuplicateTopupError is raised when trying to add a topup again
-    def test_add_topup_duplicate_topup(self):
+    def test_add_duplicate_topup(self):
+        """Test adding a duplicate topup raises DuplicateTopupError."""
         self.topup.add_topup(TopupType.FOUR_DEVICE.value, 3)
         with self.assertRaises(DuplicateTopupError):
-            self.topup.add_topup(TopupType.FOUR_DEVICE.value, 2)
+            self.topup.add_topup(TopupType.FOUR_DEVICE.value, 2)  # Trying to add again
 
-    # Test if the cost is correctly calculated based on topup type and duration
-    def test_calculate_cost(self):
-        self.topup.add_topup(TopupType.FOUR_DEVICE.value, 3)
-        self.assertEqual(self.topup.cost, 150)
+    def test_add_topup_invalid_duration(self):
+        """Test adding a topup with an invalid duration."""
+        with self.assertRaises(InvalidTopupDurationError):
+            self.topup.add_topup(TopupType.FOUR_DEVICE.value, -1)  # Invalid duration
 
-    # Test getting the topup cost
-    def test_get_topup_cost(self):
+    def test_get_topup_cost_zero_when_no_topup(self):
+        """Test that the cost is zero when no topup is added."""
+        self.assertEqual(self.topup.get_topup_cost(), TOPUP_COST_ZERO)
+
+    def test_get_topup_cost_with_topup(self):
+        """Test that the cost is calculated correctly for a valid topup."""
         self.topup.add_topup(TopupType.FOUR_DEVICE.value, 3)
-        self.assertEqual(self.topup.get_topup_cost(), 150)
+        self.assertEqual(
+            self.topup.get_topup_cost(), 150
+        )  # Assuming cost is 50 per month
 
 
 if __name__ == "__main__":

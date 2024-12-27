@@ -4,33 +4,29 @@ from src.enums.subscription_category import SubscriptionCategory
 from src.constants.error_codes import ErrorCodes
 
 
-# Plan class where plans can be added and retrieved
+# class to add and get details of plan
 class Plan:
     def __init__(self):
-        self.category = None
-        self.plan_type = None
-        self.cost = None
-        self.duration = None
-        self.plans = {}
+        self._plans = {}
 
-    # function to check whether given subscription plan is valid or not
+    # Function to check whether given subscription plan is valid or not
     def is_valid_plan(self, plan_type: str) -> PlanType:
         try:
             return PlanType[plan_type]
         except KeyError:
             return None
 
-    # function to add subscription plan with subscription category and plan type given from user
+    # Function to add subscription plan with subscription category and plan type
     def add_plan(
         self, subscription_category: SubscriptionCategory, plan_type: PlanType
     ):
-        self.plans[subscription_category] = plan_type
+        self._plans[subscription_category] = plan_type
 
-    # function to get all plans
+    # Function to get all plans
     def get_plans(self) -> dict:
-        return self.plans
+        return self._plans
 
-    # function to get  plan details
+    # Function to get plan details
     def get_plan_details(
         self, category: SubscriptionCategory, plan_type: PlanType
     ) -> dict:
@@ -39,14 +35,9 @@ class Plan:
         except KeyError:
             raise ValueError(ErrorCodes.INVALID_PLAN_DETAILS_MAPPING)
 
-        self.category = category
-        self.plan_type = plan_type
-        self.cost = plan_details["cost"]
-        self.duration = plan_details["duration"]
-
         return {
-            "category": self.category.value,
-            "plan_type": self.plan_type.value,
-            "cost": self.cost,
-            "duration_in_months": self.duration,
+            "category": category.value,
+            "plan_type": plan_type.value,
+            "cost": plan_details["cost"],
+            "duration_in_months": plan_details["duration"],
         }

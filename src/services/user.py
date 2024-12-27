@@ -6,48 +6,56 @@ from src.constants.constant import RENEWAL_REMINDER_MESSAGE, RENEWAL_AMOUNT_MESS
 
 class User:
     def __init__(self):
+        """Initialize User with services for subscriptions and top-ups."""
         self._subscription_service = SubscriptionService()
         self._topup_service = TopupService()
 
     def process_start_subscription(self, start_date):
+        """Starts a subscription with the given start date."""
         try:
             result = self._subscription_service.start_subscription(start_date)
             if result:
                 print(result)
         except Exception as e:
-            return f"Error: {str(e)}"
+            return str(e)
 
     def process_add_subscription(self, category, plan_type):
+        """Adds a subscription for the given category and plan type."""
         try:
             result = self._subscription_service.add_subscription(category, plan_type)
             if result:
                 print(result)
             return result
         except Exception as e:
-            return f"Error: {str(e)}"
+            return str(e)
 
     def process_add_topup(self, topup_type, months):
+        """Adds a top-up after validating subscription date and existence."""
         try:
-            if self._subscription_service.get_subscriptions():
-                result = self._topup_service.add_topup(topup_type, months)
-                if result:
-                    print(result)
-                return result
-            else:
+
+            if not self._subscription_service.is_subscription_date_valid():
+                print(f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_DATE}")
+                return ErrorCodes.ADD_TOPUP_FAILED
+            if not self._subscription_service.get_subscriptions():
                 print(
-                    ErrorCodes.ADD_TOPUP_FAILED
-                    + " "
-                    + ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
+                    f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.SUBSCRIPTIONS_NOT_FOUND}"
                 )
                 return ErrorCodes.ADD_TOPUP_FAILED
+
+            result = self._topup_service.add_topup(topup_type, months)
+            if result:
+                print(result)
+            return result
         except Exception as e:
-            return f"Error: {str(e)}"
+            return str(e)
 
     def process_print_renewal_details(self):
+        """Prints renewal details for subscriptions and top-ups."""
         try:
             if not self._subscription_service.get_subscriptions():
                 print(ErrorCodes.SUBSCRIPTIONS_NOT_FOUND)
                 return ErrorCodes.SUBSCRIPTIONS_NOT_FOUND
+
             total_cost = (
                 self._subscription_service.calculate_subscription_cost()
                 + self._topup_service.calculate_topup_cost()
@@ -57,7 +65,8 @@ class User:
             for category, date in renewal_dates.items():
                 renewal_details.append(f"{RENEWAL_REMINDER_MESSAGE} {category} {date}")
             renewal_details.append(f"{RENEWAL_AMOUNT_MESSAGE} {total_cost}")
+
             for detail in renewal_details:
                 print(detail)
         except Exception as e:
-            return f"Error: {str(e)}"
+            return str(e)

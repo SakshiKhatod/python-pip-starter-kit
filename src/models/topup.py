@@ -1,50 +1,53 @@
 from src.enums.topup_type import TopupType
 from src.constants.error_codes import ErrorCodes
-from src.exceptions.topup_exceptions import InvalidTopupTypeError, DuplicateTopupError
+from src.exceptions.topup_exceptions import (
+    InvalidTopupTypeError,
+    DuplicateTopupError,
+    InvalidTopupDurationError,
+)
 from src.constants.constant import TOPUP_COST_ZERO
 
 
-# Topup class for adding topups and calculting it's cost
 class Topup:
-    def __init__(self):
-        self.topup_type = None
-        self.duration = 0
-        self.cost = 0
-        self.stop_execution = False
+    """Class to add topup and get total topup cost"""
 
-    # function to check valid topup type
-    def is_valid_topup_type(self, topup_type: str) -> bool:
+    def __init__(self):
+        self._topup_type = None  # Private attribute for topup type
+        self._duration = 0  # Private attribute for duration
+        self._cost = 0  # Private attribute for cost
+        self._stop_execution = False  # Private attribute to control execution flow
+
+    def _is_valid_topup_type(self, topup_type: str) -> bool:
+        """Private method to validate a topup type."""
         return topup_type in TopupType.__members__
 
-    # function to add topup with given topup type and duration
     def add_topup(self, topup_type: str, no_of_months: int):
-        if self.topup_type:
-            self.stop_execution = True
-            raise DuplicateTopupError(
-                f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.DUPLICATE_TOPUP}"
-            )
+        """Add a topup with the given type and duration."""
+        if self._topup_type:
+            self._stop_execution = True
+            raise DuplicateTopupError(f"{ErrorCodes.DUPLICATE_TOPUP_ERROR_MESSAGE}")
 
-        if not self.is_valid_topup_type(topup_type):
-            self.stop_execution = True
+        if not self._is_valid_topup_type(topup_type):
+            self._stop_execution = True
             raise InvalidTopupTypeError(
-                f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_TOPUP_TYPE}"
+                f"{ErrorCodes.INVALID_TOPUP_TYPE_ERROR_MESSAGE}"
             )
 
         if no_of_months < 0:
-            raise InvalidTopupTypeError(
-                f"{ErrorCodes.ADD_TOPUP_FAILED} {ErrorCodes.INVALID_TOPUP_DURATION}"
+            raise InvalidTopupDurationError(
+                f"{ErrorCodes.INVALID_TOPUP_DURATION_ERROR_MESSAGE}"
             )
 
-        self.topup_type = TopupType[topup_type]
-        self.duration = no_of_months
-        self.calculate_cost()
+        self._topup_type = TopupType[topup_type]
+        self._duration = no_of_months
+        self._calculate_cost()
 
-    # function to calculate topup cost
-    def calculate_cost(self):
-        if self.topup_type and self.duration > TOPUP_COST_ZERO:
-            topup_details = self.topup_type.get_details()
-            self.cost = topup_details["cost"] * self.duration
+    def _calculate_cost(self):
+        """Private method to calculate the topup cost."""
+        if self._topup_type and self._duration > TOPUP_COST_ZERO:
+            topup_details = self._topup_type.get_details()
+            self._cost = topup_details["cost"] * self._duration
 
-    # function to get topup cost
     def get_topup_cost(self) -> int:
-        return self.cost if self.topup_type else TOPUP_COST_ZERO
+        """Get the total cost of the topup."""
+        return self._cost if self._topup_type else TOPUP_COST_ZERO

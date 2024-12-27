@@ -14,3 +14,9 @@ class InvalidTopupTypeError(TopupError):
     """Raised when an invalid topup type is provided."""
 
     pass
+
+
+class InvalidTopupDurationError(TopupError):
+    """Raised when an invalid topup duration is provided."""
+
+    pass
